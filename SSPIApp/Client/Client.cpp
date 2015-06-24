@@ -21,14 +21,14 @@
 #include "SSPIExample.h"
 
 CredHandle hCred;
-struct _SecHandle  hcText;
+struct _SecHandle  hCtxt;
 
 //  The following #define statement must be changed. ServerName must
 //  be defined as the name of the computer running the server sample.
 //  TargetName must be defined as the logon name of the user running 
 //  the server program.
-#define ServerName  "Server_Computer_Name"
-#define TargetName  "Server_User_Logon_Name"
+#define ServerName  TEXT("Server_Computer_Name")
+#define TargetName  TEXT("Server_User_Logon_Name")
 
 void main()
 {
@@ -37,8 +37,6 @@ void main()
 	BYTE              Data[BIG_BUFF];
 	PCHAR             pMessage;
 	WSADATA           wsaData;
-	CredHandle        hCred;
-	struct _SecHandle hCtxt;
 	SECURITY_STATUS   ss;
 	DWORD             cbRead;
 	ULONG             cbMaxSignature;
@@ -159,11 +157,11 @@ struct _SecHandle *hcText)
 	//--------------------------------------------------------------------
 	//  Lookup the server's address.
 
-	ulAddress = inet_addr(ServerName);
+	ulAddress = inet_addr(cstr_converter(ServerName));
 
 	if (INADDR_NONE == ulAddress)
 	{
-		pHost = gethostbyname(ServerName);
+		pHost = gethostbyname(cstr_converter(ServerName));
 		if (NULL == pHost)
 		{
 			MyHandleError("Unable to resolve host name ");
@@ -242,7 +240,7 @@ BOOL DoAuthentication(SOCKET s)
 		&fDone,
 		TargetName,
 		&hCred,
-		&hcText
+		&hCtxt
 		))
 	{
 		return(FALSE);
@@ -274,7 +272,7 @@ BOOL DoAuthentication(SOCKET s)
 			&fDone,
 			TargetName,
 			&hCred,
-			&hcText))
+			&hCtxt))
 		{
 			MyHandleError("GenClientContext failed");
 		}
@@ -298,7 +296,7 @@ BOOL GenClientContext(
 	BYTE       *pOut,
 	DWORD      *pcbOut,
 	BOOL       *pfDone,
-	CHAR       *pszTarget,
+	TCHAR       *pszTarget,
 	CredHandle *hCred,
 struct _SecHandle *hcText)
 {
@@ -313,7 +311,7 @@ struct _SecHandle *hcText)
 
 	if (NULL == pIn)
 	{
-		strcpy_s(lpPackageName, 1024 * sizeof(TCHAR), "Negotiate");
+		tstrcpy_s(lpPackageName, 1024, TEXT("Negotiate"));
 		ss = AcquireCredentialsHandle(
 			NULL,
 			lpPackageName,

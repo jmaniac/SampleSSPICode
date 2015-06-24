@@ -3,6 +3,34 @@
 #include <sspi.h>
 #include <windows.h>
 
+#ifdef UNICODE
+#define tstrcpy_s(A, B, C) wcscpy_s(A, B, C)
+#else // UNICODE
+#define tstrcpy_s(A, B, C) strcpy_s(A, B, C)
+#endif // UNICODE
+
+class cstr_converter {
+
+	char * str;
+
+public:
+	cstr_converter(TCHAR * str) {
+#ifdef UNICODE
+		size_t size, len = wcslen(str) + 1;
+		this->str = new char[len];
+		wcstombs_s(&size, this->str, len, str, len);
+#else // UNICODE
+		this->str = str;
+#endif // UNICODE
+	}
+
+	operator const char * () const { return str; }
+
+#ifdef UNICODE
+	~cstr_converter() { delete[] str; }
+#endif
+};
+
 BOOL SendMsg(SOCKET s, PBYTE pBuf, DWORD cbBuf);
 BOOL ReceiveMsg(SOCKET s, PBYTE pBuf, DWORD cbBuf, DWORD *pcbRead);
 BOOL SendBytes(SOCKET s, PBYTE pBuf, DWORD cbBuf);
@@ -15,7 +43,7 @@ BOOL GenClientContext(
 	BYTE *pOut,
 	DWORD *pcbOut,
 	BOOL *pfDone,
-	CHAR *pszTarget,
+	TCHAR *pszTarget,
 	CredHandle *hCred,
 struct _SecHandle *hcText
 	);

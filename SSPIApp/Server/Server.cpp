@@ -28,7 +28,7 @@ void main()
 	DWORD cbMessage;
 	PBYTE pDataToClient = NULL;
 	DWORD cbDataToClient = 0;
-	PCHAR pUserName = NULL;
+	LPTSTR pUserName = NULL;
 	DWORD cbUserName = 0;
 	SOCKET Server_Socket;
 	WSADATA wsaData;
@@ -42,7 +42,7 @@ void main()
 	//-----------------------------------------------------------------   
 	//  Set the default package to negotiate.
 
-	strcpy_s(g_lpPackageName, 1024 * sizeof(TCHAR), "Negotiate");
+	tstrcpy_s(g_lpPackageName, 1024, TEXT("Negotiate"));
 
 	//-----------------------------------------------------------------   
 	//  Initialize the socket interface and the security package.
@@ -124,7 +124,7 @@ void main()
 		}
 		else
 		{
-			printf("Package Name: %s\n", SecPkgNegInfo.PackageInfo->Name);
+			printf("Package Name: %s\n", (const char*)cstr_converter(SecPkgNegInfo.PackageInfo->Name));
 		}
 
 		//----------------------------------------------------------------
@@ -147,7 +147,7 @@ void main()
 		}
 
 		GetUserName(NULL, &cbUserName);
-		pUserName = (PCHAR)malloc(cbUserName);
+		pUserName = (LPTSTR)malloc(cbUserName * sizeof(TCHAR));
 
 		if (!pUserName)
 		{
@@ -164,7 +164,7 @@ void main()
 		}
 		else
 		{
-			printf("Client connected as :  %s\n", pUserName);
+			printf("Client connected as :  %s\n", (const char*)cstr_converter(pUserName));
 		}
 
 		//-----------------------------------------------------------------   
